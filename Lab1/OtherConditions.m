@@ -52,6 +52,7 @@ figure(1);
 hold on
 yyaxis left
 plot(t_baseline, baseline_dist);
+plot(t_baseline, actual_dist*ones(length(t_baseline),1))
 title('Medium Range Sensor at 18Hz, Aluminum Block')
 xlabel('Time (s)')
 ylabel('Distance (cm)')
@@ -66,6 +67,7 @@ figure(2);
 hold on
 yyaxis left
 plot(t_tilted, tilted_dist);
+plot(t_tilted, actual_dist*ones(length(t_tilted),1))
 title('Medium Range Sensor at 18Hz, Tilted Block')
 xlabel('Time (s)')
 ylabel('Distance (cm)')
@@ -79,6 +81,7 @@ figure(3);
 hold on
 yyaxis left
 plot(t_wood, wood_dist);
+plot(t_wood, actual_dist*ones(length(t_wood),1))
 title('Medium Range Sensor at 18Hz, Wood Block')
 xlabel('Time (s)')
 ylabel('Distance (cm)')
@@ -88,3 +91,21 @@ plot(t_wood, error_wood);
 ylabel('%Error')
 hold off
 
+%% Average errors
+baseline_dist = sprintf('Average baseline distance was %.2f with std of %.2f', mean(baseline_dist), std(baseline_dist));
+disp(baseline_dist);
+
+baseline_err = sprintf('Average baseline error was %.2f with std of %.2f', mean(error_baseline), std(error_baseline));
+disp(baseline_err);
+
+tilted_dist = sprintf('Average tilted was %.2f with std of %.2f', mean(tilted_dist), std(tilted_dist));
+disp(tilted_dist);
+
+tilted_err = sprintf('Average tilted error was %.2f with std of %.2f', mean(error_tilted), std(error_tilted));
+disp(tilted_err);
+
+wood_dist = sprintf('Average wood was %.2f with std of %.2f', mean(wood_dist), std(wood_dist));
+disp(wood_dist);
+
+wood_err = sprintf('Average wood error was %.2f with std of %.2f', mean(error_wood), std(error_wood));
+disp(wood_err);
