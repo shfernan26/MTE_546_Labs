@@ -1,0 +1,64 @@
+%% Enter information here
+clc;
+clear all;
+close all;
+% Distances tested
+actual_dist = [10 15 20 25 30];
+% Data 
+load('./Take2/TwoSensors_10cm_18Hz.mat')
+ts_10cm = data;
+load('./Take2/TwoSensors_15cm_18Hz.mat')
+ts_15cm = data;
+load('./Take2/TwoSensors_20cm_18Hz.mat')
+ts_20cm = data;
+load('./Take2/TwoSensors_25cm_18Hz.mat')
+ts_25cm = data;
+load('./Take2/TwoSensors_30cm_18Hz.mat')
+ts_30cm = data;
+
+% Model eqns 
+syms x
+
+% Eqn that converts voltage given distance
+sr(x) = exp(-x);
+mr(x) = exp(-2*x);
+
+%% Calculate mean of each sensor at different distances
+short_volts = [mean(ts_10cm(:,1)) mean(ts_15cm(:,1)) mean(ts_20cm(:,1)) mean(ts_25cm(:,1)) mean(ts_30cm(:,1))];
+med_volts = [mean(ts_10cm(:,2)) mean(ts_15cm(:,2)) mean(ts_20cm(:,2)) mean(ts_25cm(:,2)) mean(ts_30cm(:,2))];
+
+%% Use model inverse to generate distance measurements
+
+sr_inv = finverse(sr);
+mr_inv = finverse(mr);
+
+if length(short_volts) ~= length(med_volts)
+    msg = 'Length of arrays not the same';
+    error(msg)
+end
+
+short_dist = zeros(1, length(short_volts));
+med_dist = zeros(1, length(med_volts));
+for i = 1:length(short_volts)
+    short_dist(i) = subs(sr_inv, x, short_volts(i));
+    med_dist(i) = subs(mr_inv, x, med_volts(i));
+end
+
+
+%% Plots
+% a) Comparison of two sensors
+
+figure(1);
+hold on
+plot(actual_dist, short_dist);
+plot(actal_dist, med_dist);
+error = short_dist - med_dist;
+plot(actual_dist, erro
+
+
+
+
+
+
+
+

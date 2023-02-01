@@ -26,7 +26,7 @@ legend('Collected Data','Fitted Function')
 title('Short Range Distance Means')
 xlabel('Distance (cm)')
 ylabel('Voltage (V)')
-short_eqn = sprintf('y = (%.6f) x^2 + (%.6f) x + (%.6f)',p(1),p(2),p(3));
+short_eqn = sprintf('y = (%.6f) x^3 + (%.6f) x^2 + (%.6f) x + (%.6f)',p(1),p(2),p(3),p(4));
 disp(short_eqn)
 
 figure(2)
@@ -40,7 +40,7 @@ legend('Collected Data','Fitted Function')
 title('Medium Range Distance Means')
 xlabel('Distance (cm)')
 ylabel('Voltage (V)')
-med_eqn = sprintf('y = (%.6f) x^2 + (%.6f) x + (%.6f)',p(1),p(2),p(3));
+med_eqn = sprintf('y = (%.6f) x^3 + (%.6f) x^2 + (%.6f) x + (%.6f)',p(1),p(2),p(3),p(4));
 disp(med_eqn)
 
 figure(3)
@@ -54,5 +54,5 @@ legend('Collected Data','Fitted Function')
 title('Long Range Distance Means')
 xlabel('Distance (cm)')
 ylabel('Voltage (V)')
-long_eqn = sprintf('y = (%.6f) x^2 + (%.6f) x + (%.6f)',p(1),p(2),p(3));
+long_eqn = sprintf('y = (%.6f) x^3 + (%.6f) x^2 + (%.6f) x + (%.6f)',p(1),p(2),p(3),p(4));
 disp(long_eqn)
