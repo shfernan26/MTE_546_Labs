@@ -20,9 +20,9 @@ figure(1)
 short_dist = [4 10 20 25 30];
 hold on
 scatter(short_dist, each_short_mean);
-x0 = [112703 97 2 0]; 
+x0 = [50 6.4 1.3 -0.2]; 
 rational = fittype( @(a,b,c,d,x) (a*(x + b).^(-c))+d );
-[fitted_curve,gof] = fit(short_dist',each_short_mean',rational,'StartPoint',x0);
+[fitted_curve,gof] = fit(short_dist',each_short_mean',rational,'StartPoint',x0)
 p = coeffvalues(fitted_curve);
 plot(short_dist, fitted_curve(short_dist))
 hold off
@@ -39,7 +39,7 @@ hold on
 scatter(med_dist, each_med_mean);
 x0 = [112703 97 2 0]; 
 rational = fittype( @(a,b,c,d,x) (a*(x + b).^(-c))+d );
-[fitted_curve,gof] = fit(med_dist',each_med_mean',rational,'StartPoint',x0);
+[fitted_curve,gof] = fit(med_dist',each_med_mean',rational,'StartPoint',x0)
 p = coeffvalues(fitted_curve);
 plot(med_dist, fitted_curve(med_dist))
 hold off
@@ -56,7 +56,7 @@ hold on
 scatter(long_dist, each_long_mean);
 x0 = [1 1 1 1]; 
 rational = fittype( @(a,b,c,d,x) (a*(x + b).^(-c))+d );
-[fitted_curve,gof] = fit(long_dist',each_long_mean',rational,'StartPoint',x0);
+[fitted_curve,gof] = fit(long_dist',each_long_mean',rational,'StartPoint',x0)
 p = coeffvalues(fitted_curve);
 plot(long_dist, fitted_curve(long_dist))
 hold off
