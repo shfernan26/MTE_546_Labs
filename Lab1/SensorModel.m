@@ -30,7 +30,7 @@ legend('Collected Data','Fitted Function')
 title('Short Range Distance Means')
 xlabel('Distance (cm)')
 ylabel('Voltage (V)')
-short_eqn = sprintf('y = (%.6f)*( x + (%.6f) )^(-(%.6f)) + (%.6f)',p(1),p(2),p(3),p(4));
+short_eqn = sprintf('y = (%.6f) x^2 + (%.6f) x + (%.6f)',p(1),p(2),p(3));
 disp(short_eqn)
 
 figure(2)
