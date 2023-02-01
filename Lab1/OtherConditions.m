@@ -20,7 +20,7 @@ t_wood = time;
 syms x
 
 % Eqn that converts voltage given distance
-mr(x) = exp(-2*x);
+mr(x) = (1526.721939)*( x + (63.448101) )^(-(1.501067)) + (-0.750698); % Medium range sensor model
 
 %% Use model inverse to generate distance measurements
 
@@ -50,33 +50,41 @@ end
 
 figure(1);
 hold on
+yyaxis left
 plot(t_baseline, baseline_dist);
-error_baseline = baseline_dist - actual_dist;
-plot(t_baseline, error_baseline);
-hold off
-legend('Baseline Conditions','Error')
 title('Medium Range Sensor at 18Hz, Aluminum Block')
 xlabel('Time (s)')
 ylabel('Distance (cm)')
+yyaxis right
+error_baseline = (baseline_dist - actual_dist) .* 100 ./ actual_dist;
+plot(t_baseline, error_baseline);
+ylabel('%Error')
+hold off
+
 
 figure(2);
 hold on
+yyaxis left
 plot(t_tilted, tilted_dist);
-error_tilted = tilted_dist - actual_dist;
-plot(t_tilted, error_tilted);
-hold off
-legend('Tilted Block','Error')
 title('Medium Range Sensor at 18Hz, Tilted Block')
 xlabel('Time (s)')
 ylabel('Distance (cm)')
+yyaxis right
+error_tilted = (tilted_dist - actual_dist) .* 100 ./ actual_dist;
+plot(t_tilted, error_tilted);
+ylabel('%Error')
+hold off
 
 figure(3);
 hold on
+yyaxis left
 plot(t_wood, wood_dist);
-error_wood = wood_dist - actual_dist;
-plot(t_wood, error_wood);
-hold off
-legend('Wood Block','Error')
 title('Medium Range Sensor at 18Hz, Wood Block')
 xlabel('Time (s)')
 ylabel('Distance (cm)')
+yyaxis right
+error_wood = (wood_dist - actual_dist) .* 100 ./ actual_dist;
+plot(t_wood, error_wood);
+ylabel('%Error')
+hold off
+

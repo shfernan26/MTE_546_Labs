@@ -20,17 +20,14 @@ figure(1)
 short_dist = [4 10 20 25 30];
 hold on
 scatter(short_dist, each_short_mean);
-x0 = [112703 97 2 0]; 
-rational = fittype( @(a,b,c,d,x) (a*(x + b).^(-c))+d );
-[fitted_curve,gof] = fit(short_dist',each_short_mean',rational,'StartPoint',x0);
-p = coeffvalues(fitted_curve);
-plot(short_dist, fitted_curve(short_dist))
+p = polyfit(short_dist, each_short_mean, 2);
+plot(short_dist, polyval(p, short_dist))
 hold off
 legend('Collected Data','Fitted Function')
 title('Short Range Distance Means')
 xlabel('Distance (cm)')
 ylabel('Voltage (V)')
-short_eqn = sprintf('y = (%.6f)*( x + (%.6f) )^(-(%.6f)) + (%.6f)',p(1),p(2),p(3),p(4));
+short_eqn = sprintf('y = (%.6f) x^2 + (%.6f) x + (%.6f)',p(1),p(2),p(3));
 disp(short_eqn)
 
 figure(2)

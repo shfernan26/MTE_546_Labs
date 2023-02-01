@@ -17,7 +17,7 @@ t_180Hz = time;
 syms x
 
 % Eqn that converts voltage given distance
-mr(x) = exp(-2*x);
+mr(x) = (1526.721939)*( x + (63.448101) )^(-(1.501067)) + (-0.750698); % Medium range sensor model
 
 %% Use model inverse to generate distance measurements
 
@@ -39,22 +39,41 @@ end
 
 figure(1);
 hold on
+yyaxis left
 plot(t_18Hz, inv_18);
-error_18Hz = inv_18 - actual_dist;
-plot(t_18Hz, error_18Hz);
-hold off
-legend('Sensor Reading','Error')
-title('Medium Range Sensor at 18Hz')
+plot(t_18Hz, actual_dist*ones(length(t_18Hz),1))
+title('Medium Range Sensor at 18Hz, 27cm')
 xlabel('Time (s)')
 ylabel('Measured Distance (cm)')
+yyaxis right
+error_18Hz = (inv_18 - actual_dist) .*100 ./ actual_dist;
+plot(t_18Hz, error_18Hz);
+ylabel('%Error')
+hold off
 
 figure(2);
 hold on
+yyaxis left
 plot(t_180Hz, inv_180);
-error_180Hz = inv_180 - actual_dist;
-plot(t_180Hz, error_180Hz);
-hold off
-legend('Sensor Reading','Error')
+plot(t_18Hz, actual_dist*ones(length(t_18Hz),1))
 title('Medium Range Sensor at 180Hz')
 xlabel('Time (s)')
 ylabel('Measured Distance (cm)')
+yyaxis right
+error_180Hz = (inv_180 - actual_dist) .*100 ./ actual_dist;
+plot(t_180Hz, error_180Hz);
+ylabel('%Error')
+hold off
+
+%% Average errors
+ave_18_dist = sprintf('Average 18Hz was %.2f with std of %.2f', mean(inv_18), std(inv_18));
+disp(ave_18_dist);
+
+ave_18_err = sprintf('Average 18Hz error was %.2f with std of %.2f', mean(error_18Hz), std(error_18Hz));
+disp(ave_18_err);
+
+ave_180_dist = sprintf('Average 180Hz was %.2f with std of %.2f', mean(inv_180), std(inv_180));
+disp(ave_180_dist);
+
+ave_180_err = sprintf('Average 180Hz error was %.2f', mean(error_180Hz), std(error_180Hz));
+disp(ave_180_err);
