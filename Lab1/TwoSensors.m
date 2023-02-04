@@ -20,7 +20,7 @@ ts_30cm = data;
 syms x
 
 % Eqn that converts voltage given distance
-sr(x) = (0.003788)*x^2 + (-0.196472)*x + (2.799394); % Short range sensor model:
+sr(x) = (5.224514)*( x + (-2.196009) )^(-(0.198318)) + (-2.468841); % Short range sensor model:
 mr(x) = (1526.721939)*( x + (63.448101) )^(-(1.501067)) + (-0.750698); % Medium range sensor model
 
 %% Calculate mean of each sensor at different distances
@@ -43,7 +43,7 @@ ave_dist = zeros(1, length(med_volts));
 for i = 1:length(short_volts)
     short_dist(i) = subs(sr_inv, x, short_volts(i));
     med_dist(i) = subs(mr_inv, x, med_volts(i));
-    ave_dist(i) = short_dist(i) + med_dist(i) / 2;
+    ave_dist(i) = (short_dist(i) + med_dist(i)) ./ 2;
 end
 
 
@@ -58,7 +58,7 @@ two_sens_diff = med_dist - short_dist;
 plot(actual_dist, two_sens_diff)
 legend('Short Range','Medium Range', 'Difference between sensors')
 title('Short Range Sensor vs. Medium Range Sensor Difference')
-xlabel('True Distance (cm)')
+xlabel('Ruler Distance (cm)')
 ylabel('Measured Distance (cm)')
 
 
@@ -68,7 +68,7 @@ hold on
 yyaxis left
 plot(actual_dist, short_dist);
 title('Short Range Sensor vs. Ruler Distance Difference')
-xlabel('True Distance (cm)')
+xlabel('Ruler Distance (cm)')
 ylabel('Measured Distance (cm)')
 yyaxis right
 short_err = (short_dist - actual_dist).*100 ./ actual_dist;
@@ -81,7 +81,7 @@ hold on
 yyaxis left
 plot(actual_dist, med_dist);
 title('Medium Range Sensor vs. Ruler Distance Difference')
-xlabel('True Distance (cm)')
+xlabel('Ruler Distance (cm)')
 ylabel('Measured Distance (cm)')
 yyaxis right
 med_err = (med_dist - actual_dist).*100 ./ actual_dist;
@@ -95,7 +95,7 @@ hold on
 yyaxis left
 plot(actual_dist, ave_dist);
 title('Sensor Average vs. Ruler Distance Difference')
-xlabel('True Distance (cm)')
+xlabel('Ruler Distance (cm)')
 ylabel('Measured Distance (cm)')
 yyaxis right
 ave_err = (ave_dist - actual_dist).*100 ./ actual_dist;
