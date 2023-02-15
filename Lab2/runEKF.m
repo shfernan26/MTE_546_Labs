@@ -7,8 +7,8 @@ close all
 
 rng(0,'twister'); % Sets repeatable randomness
 
-T = 0.5; % Sample rate
-sim_time = 10; 
+T = 0.05; % Sample period
+sim_time = 10; % Simulation duration
 sim_time_arr = 1:T:sim_time;
 N = length(sim_time_arr);
 
@@ -19,9 +19,9 @@ volts = (28.909879)*( dist + (2.844489) )^(-(1.236330)) + (0.043781);
 volt_func = matlabFunction(volts);
 
 
-R = 0.5136; % Variance of Lab 1 short range data
-Q = [0.01 0;
-    0 0.02];
+R = 0.5136; % Measurement error covariance (Lab 1 data variance)
+Q = [0.001 0; % Process noise covariance
+    0 0.002];
 A = [1 T; 
      0 1];
 
@@ -54,7 +54,7 @@ plot(sim_time_arr, y);
 legend('Sensor 1', 'Sensor 2', 'Average');
 title('Sensor Average');
 xlabel('Time (s)');
-ylabel('Distance (cm)');
+ylabel('Voltage (cm)');
 hold off
 
 
@@ -81,8 +81,7 @@ end
 
 %% EKF 
 
-
-x0 = [10; 2]; % Initial state
+x0 = [14; 2.8]; % Initial state estimate
 
 % IC's
 x = zeros(2,N);
@@ -98,6 +97,7 @@ H = matlabFunction(H_jacob);
 
 P_hat = zeros(2,2,N);
 x_hat = zeros(2,N);
+x_hat(:,1) = x0;
 K = zeros(2);
 w = zeros(2,N);
 v = zeros(1,N);
@@ -127,3 +127,11 @@ xlabel('Time (s)');
 ylabel('Distance (cm)');
 hold off
 
+% For simulation only
+figure(3);
+hold on;
+per_error = (x_hat(1,:) - true_pos) .*100 ./ true_pos;
+scatter(sim_time_arr, per_error);
+title('% Error Over Test Run');
+xlabel('Time (s)');
+ylabel('Error (%)');
