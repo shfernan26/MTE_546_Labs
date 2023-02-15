@@ -9,8 +9,6 @@ load('./data/Test1.mat')
 % Sensor data will be average of both sensors
 y = mean(data,2);
 
-
-
 x0 = [10; 0];
 R = 0.5136; % Variance of lab1 short range data
 Q = [0.01 0;
@@ -76,3 +74,4 @@ plot(sim_time_arr, true_pos);
 legend('State Estimate', 'Prediction', '"True" Pos');
 title('Predicted vs Current Distance');
 hold off
+
