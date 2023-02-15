@@ -4,27 +4,63 @@
 clc;
 clear all
 close all
-load('./data/Test1.mat')
-
 
 rng(0,'twister'); % Sets repeatable randomness
 
-x0 = [10; 2]; % Initial state
-
-R = 0.5136; % Variance of Lab 1 short range data
-% Sensor data will be average of both sensors
-y = mean(data,2);
-
-Q = [0.01 0;
-    0 0.02];
-
-T = 0.1; % Sample rate
-A = [1 T; 
-     0 1];
-
+T = 0.5; % Sample rate
 sim_time = 10; 
 sim_time_arr = 1:T:sim_time;
 N = length(sim_time_arr);
+
+%% Key Model Parameters
+% Common sensor model
+syms dist
+volts = (28.909879)*( dist + (2.844489) )^(-(1.236330)) + (0.043781);
+volt_func = matlabFunction(volts);
+
+
+R = 0.5136; % Variance of Lab 1 short range data
+Q = [0.01 0;
+    0 0.02];
+A = [1 T; 
+     0 1];
+
+
+% Choose source of sensor measurements in next section
+%% CHOICE A - SIMULATION
+% sim_range=linspace(1,sim_time,N)';
+% f=@(t) 10+2*t + Q(1,1)*randn + 0;
+% block_pos=feval(f,sim_range);
+% 
+% % Measurement model - converts distance to voltage
+% y = feval(volt_func, sim_range)+ R(1,1)*randn + 0;
+
+
+%% CHOICE B - REAL WORLD
+
+load('./data/Test1.mat')
+% Sensor data will be average of both sensors
+y1 = mean(data,2);
+y = downsample(y1,ceil(T/0.02857)); % Downsample by factor of target period / 35Hz i.e 0.02857s
+% If sim array is longer than real world data after downsampling, append 0s
+if N > length(y) 
+    y(numel(sim_time_arr)) = 0;
+else % If sim array is shorter, slice real world data to shorten
+    y = y(1:N);
+end
+
+%% TRUE POSITION 
+
+true_pos = 10;
+% Actual Motion
+for i = 2:N
+    true_pos(end+1) = true_pos(end) + 2*T; % d2 = d1 + v*t
+end
+
+%% EKF 
+
+
+x0 = [10; 2]; % Initial state
 
 % IC's
 x = zeros(2,N);
@@ -33,13 +69,8 @@ P = zeros(2,2,N);
 P(:,:,1) = Q;
 z_hat = zeros(N);
 
-% % Jacobian for motion model not needed (already linear)
-% syms d v 
-% F = double(jacobian([d+T*v ,v],[d,v]));
-
-% Jacobian for measurement model - converts distance to voltage
 syms dist vel
-volts = (28.909879)*( dist + (2.844489) )^(-(1.236330)) + (0.043781);
+% Jacobian for measurement model
 H_jacob = jacobian(volts, [dist, vel]);
 H = matlabFunction(H_jacob);
 
@@ -47,36 +78,30 @@ P_hat = zeros(2,2,N);
 x_hat = zeros(2,N);
 K = zeros(2);
 w = zeros(2,N);
-v = zeros(N);
+v = zeros(1,N);
 
-for n = 2:length(sim_time_arr)
+for n = 2:N
     w(:,n) = [Q(1,1)*randn + 0 ; Q(2,2)*randn + 0];
     v(n) = R(1,1)*randn + 0;
      
-    x_hat(:,n) = A*x(:,n-1) +  w(:,n);
+    x_hat(:,n) = A*x(:,n-1) + w(:,n);
     z_hat(n) = H(x(1,n))*x(:,n) + v(n);
-    P_hat(:,:,n) = F*P(:,:,n-1)*F'+Q;
+    P_hat(:,:,n) = A*P(:,:,n-1)*A'+Q;
     K = P_hat(:,:,n)*H(x(1,n))'/( H(x(1,n))*P_hat(:,:,n)*H(x(1,n))'+R );
     
     x(:,n) = x_hat(:,n) + K*(y(n) - z_hat(n-1));
     P(:,:,n) = ( eye(2)-K*H(x(1,n)) )*P(:,:,n);   
 end
 
-
-true_pos = x0(1);
-% Actual Motion
-for i = 2:length(sim_time_arr)
-    true_pos(end+1) = true_pos(end) + x0(2)*T; 
-end
-
-
-% Plots
+%% Plots
 figure(1);
 hold on;
 plot(sim_time_arr, x(1,:));
 plot(sim_time_arr, x_hat(1,:));
 plot(sim_time_arr, true_pos);
-legend('State Estimate', 'Prediction', '"True" Pos');
+legend('State Estimate', 'Prediction', '"True" Pos', 'Sensor Measurement');
 title('Predicted vs Current Distance');
 hold off
 
+figure(2);
+plot(sim_time_arr, y);
