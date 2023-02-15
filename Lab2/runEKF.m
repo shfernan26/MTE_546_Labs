@@ -13,7 +13,7 @@ sim_time_arr = 1:T:sim_time;
 N = length(sim_time_arr);
 
 %% Key Model Parameters
-% Common sensor model
+% Common short range sensor model
 syms dist
 volts = (28.909879)*( dist + (2.844489) )^(-(1.236330)) + (0.043781);
 volt_func = matlabFunction(volts);
@@ -26,28 +26,50 @@ A = [1 T;
      0 1];
 
 
-% Choose source of sensor measurements in next section
+% Choose source of sensor measurements in next section (comment out
+% unneeded section
 %% CHOICE A - SIMULATION
-% sim_range=linspace(1,sim_time,N)';
-% f=@(t) 10+2*t + Q(1,1)*randn + 0;
-% block_pos=feval(f,sim_range);
-% 
-% % Measurement model - converts distance to voltage
-% y = feval(volt_func, sim_range)+ R(1,1)*randn + 0;
+% Motion model plus Gaussian noise
+sim_range=linspace(1,sim_time,N)';
+f=@(t) 10+2*t + (Q(1,1)*randn + 0);
+block_pos=feval(f,sim_range);
+
+% Measurement model plus Gaussian noise - converts distance to voltage
+y1 = feval(volt_func, block_pos) + (R(1,1)*randn + 0);
+y2 = feval(volt_func, block_pos) + (R(1,1)*randn + 0);
+y = (y1 + y2) / 2;
+
+figure(1);
+subplot(2,1,1);
+plot(sim_time_arr, block_pos);
+title('Block position');
+xlabel('Time (s)');
+ylabel('Distance (cm)');
+
+subplot(2,1,2);
+hold on;
+plot(sim_time_arr, y1);
+plot(sim_time_arr, y2);
+plot(sim_time_arr, y);
+legend('Sensor 1', 'Sensor 2', 'Average');
+title('Sensor Average');
+xlabel('Time (s)');
+ylabel('Distance (cm)');
+hold off
 
 
 %% CHOICE B - REAL WORLD
 
-load('./data/Test1.mat')
-% Sensor data will be average of both sensors
-y1 = mean(data,2);
-y = downsample(y1,ceil(T/0.02857)); % Downsample by factor of target period / 35Hz i.e 0.02857s
-% If sim array is longer than real world data after downsampling, append 0s
-if N > length(y) 
-    y(numel(sim_time_arr)) = 0;
-else % If sim array is shorter, slice real world data to shorten
-    y = y(1:N);
-end
+% load('./data/Test1.mat')
+% % Sensor data will be average of both sensors
+% y1 = mean(data,2);
+% y = downsample(y1,ceil(T/0.02857)); % Downsample by factor of target period / 35Hz i.e 0.02857s
+% % If sim array is longer than real world data after downsampling, append 0s
+% if N > length(y) 
+%     y(numel(sim_time_arr)) = 0;
+% else % If sim array is shorter, slice real world data to shorten
+%     y = y(1:N);
+% end
 
 %% TRUE POSITION 
 
@@ -94,14 +116,14 @@ for n = 2:N
 end
 
 %% Plots
-figure(1);
+figure(2);
 hold on;
 plot(sim_time_arr, x(1,:));
 plot(sim_time_arr, x_hat(1,:));
 plot(sim_time_arr, true_pos);
 legend('State Estimate', 'Prediction', '"True" Pos', 'Sensor Measurement');
-title('Predicted vs Current Distance');
+title('Measured/Predicted Distance vs. Time');
+xlabel('Time (s)');
+ylabel('Distance (cm)');
 hold off
 
-figure(2);
-plot(sim_time_arr, y);
