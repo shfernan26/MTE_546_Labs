@@ -12,7 +12,7 @@ sim_time = 10; % Simulation duration
 sim_time_arr = 0:T:sim_time;
 N = length(sim_time_arr);
 
-mode = 'real'; % 'simulation' or 'real'
+mode = 'simulation'; % 'simulation' or 'real'
 
 %% Key Model Parameters
 % Common short range sensor model
@@ -34,7 +34,7 @@ A = [1 T;
 if strcmp(mode, 'simulation')
     % Motion model plus Gaussian noise
     sim_range=linspace(1,sim_time,N)';
-    f=@(t) 10+2*t + (Q(1,1)*randn + 0);
+    f=@(t) 10+0*t + (Q(1,1)*randn + 0);
     block_pos=feval(f,sim_range);
     
     % Measurement model plus Gaussian noise - converts distance to voltage
@@ -84,15 +84,6 @@ if strcmp(mode, 'real')
     ylabel('Voltage (V)');
 end
 
-
-%% TRUE POSITION 
-
-true_pos = 10;
-% Actual Motion
-for i = 2:N
-    true_pos(end+1) = true_pos(end) + 2*T; % d2 = d1 + v*t
-end
-
 %% EKF 
 
 x0 = [10; 2]; % Initial state estimate
@@ -102,7 +93,7 @@ x = zeros(2,N);
 x(:,1) = x0;
 P = zeros(2,2,N);
 P(:,:,1) = Q;
-z_hat = zeros(N);
+z_hat = zeros(1,N);
 
 syms dist vel
 % Jacobian for measurement model
@@ -122,7 +113,7 @@ for n = 2:N
     v(n) = R(1,1)*randn + 0;
      
     x_hat(:,n) = A*x(:,n-1) + w(:,n);
-    z_hat(n) = feval(volt_func, x_hat(1,n))+ v(n);
+    z_hat(n) = feval(volt_func, x_hat(1,n)) + v(n);
     P_hat(:,:,n) = A*P(:,:,n-1)*A'+ Q;
     K = P_hat(:,:,n)*H(x(1,n))'/( H(x(1,n))*P_hat(:,:,n)*H(x(1,n))'+R );
     K_arr(:,n) = K;
@@ -132,7 +123,16 @@ for n = 2:N
 
 end
 
+%% TRUE POSITION - SIMULATION
+
+true_pos = 10;
+% Actual Motion
+for i = 2:N
+    true_pos(end+1) = true_pos(end) + 0*T; % d2 = d1 + v*t
+end
+
 %% Plots
+
 figure(2);
 hold on;
 plot(sim_time_arr, x(1,:));
